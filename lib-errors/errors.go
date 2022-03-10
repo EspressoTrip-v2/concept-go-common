@@ -1,28 +1,120 @@
-package lib_errors
+package libErrors
+
+import "net/http"
+
+type ErrorTypes string
 
 const (
-	NOT_FOUND          = "NOT_FOUND"
-	BAD_REQUEST        = "BAD_REQUEST"
-	NOT_AUTHORIZED     = "NOT_AUTHORIZED"
-	INVALID_ROLE       = "INVALID_ROLE"
-	UNKNOWN            = "UNKNOWN"
-	INTERNAL           = "INTERNAL"
-	EVENT_PUBLISH      = "EVENT_PUBLISH"
-	PAYLOAD_VALIDATION = "PAYLOAD_VALIDATION"
-	PAYLOAD_ENCRYPTION = "PAYLOAD_ENCRYPTION"
-	ENV                = "ENV"
+	NOT_FOUND          ErrorTypes = "NOT_FOUND"
+	BAD_REQUEST        ErrorTypes = "BAD_REQUEST"
+	NOT_AUTHORIZED     ErrorTypes = "NOT_AUTHORIZED"
+	INVALID_ROLE       ErrorTypes = "INVALID_ROLE"
+	INTERNAL           ErrorTypes = "INTERNAL"
+	EVENT_PUBLISH      ErrorTypes = "EVENT_PUBLISH"
+	PAYLOAD_VALIDATION ErrorTypes = "PAYLOAD_VALIDATION"
+	PAYLOAD_ENCRYPTION ErrorTypes = "PAYLOAD_ENCRYPTION"
+	ENV                ErrorTypes = "ENV"
 )
 
-type CustomError interface {
-	GetError() []ErrorObject
-	ErrorStatus() int
+type CustomError struct {
+	ErrorType ErrorTypes
+	Status    int
+	Message   string
 }
 
 type Error struct {
-	Type    string
-	Message string
-	Status  int
+	Type    ErrorTypes `json:"type"`
+	Message string     `json:"message"`
+	Status  int        `json:"status"`
 }
 type ErrorObject struct {
 	error Error
+}
+
+func (e CustomError) GetErrors() []ErrorObject {
+	return []ErrorObject{{Error{
+		Type:    e.ErrorType,
+		Message: e.Message,
+		Status:  e.Status,
+	}}}
+}
+
+func (e CustomError) ErrorStatus() int {
+	return e.Status
+}
+
+func (e CustomError) Type() ErrorTypes {
+	return e.ErrorType
+}
+
+func NewBadRequestError(msg string) *CustomError {
+	return &CustomError{
+		ErrorType: BAD_REQUEST,
+		Status:    http.StatusBadRequest,
+		Message:   msg,
+	}
+}
+
+func NewDatabaseError(msg string) *CustomError {
+	return &CustomError{
+		ErrorType: INTERNAL,
+		Status:    http.StatusInternalServerError,
+		Message:   msg,
+	}
+}
+
+func NewElevatedAuthError() *CustomError {
+	return &CustomError{
+		ErrorType: INVALID_ROLE,
+		Status:    http.StatusUnauthorized,
+		Message:   "Invalid user role",
+	}
+}
+
+func NewEventPublisherError(msg string) *CustomError {
+	return &CustomError{
+		ErrorType: EVENT_PUBLISH,
+		Status:    http.StatusInternalServerError,
+		Message:   msg,
+	}
+}
+
+func NewNotAuthorizedError() *CustomError {
+	return &CustomError{
+		ErrorType: NOT_AUTHORIZED,
+		Status:    http.StatusUnauthorized,
+		Message:   "Not unauthorized",
+	}
+}
+
+func NewNotFoundError(msg string) *CustomError {
+	return &CustomError{
+		ErrorType: NOT_FOUND,
+		Status:    http.StatusNotFound,
+		Message:   msg,
+	}
+}
+
+func NewPayloadEncryptionError() *CustomError {
+	return &CustomError{
+		ErrorType: PAYLOAD_ENCRYPTION,
+		Status:    http.StatusBadRequest,
+		Message:   "JWT payload encryption error",
+	}
+}
+
+func NewPayloadValidationError() *CustomError {
+	return &CustomError{
+		ErrorType: PAYLOAD_VALIDATION,
+		Status:    http.StatusBadRequest,
+		Message:   "Validation error",
+	}
+}
+
+func NewEnvError() *CustomError {
+	return &CustomError{
+		ErrorType: ENV,
+		Status:    http.StatusNotImplemented,
+		Message:   "Missing required env variable",
+	}
 }

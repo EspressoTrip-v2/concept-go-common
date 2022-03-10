@@ -3,7 +3,6 @@ package events
 import (
 	"encoding/json"
 	"fmt"
-	libErrors "github.com/EspressoTrip-v2/concept-go-common/lib-errors"
 	"github.com/streadway/amqp"
 )
 
@@ -24,40 +23,28 @@ func NewEventPublish(rabbitConnection *amqp.Connection, exchangeName ExchangeNam
 
 }
 
-func (p *EventPublish) Publish(data interface{}) *libErrors.CustomError {
+func (p *EventPublish) Publish(data interface{}) {
 	ch, err := p.rabbitConnection.Channel()
-	if err := p.failOnError(err); err != nil {
-		return err
-	}
+	p.failOnError(err)
 	defer ch.Close()
 
 	// declare the exchange if it does not exist
 	err = ch.ExchangeDeclare(string(p.exchangeName), string(p.exchangeType), true, false, false, false, nil)
-	if err := p.failOnError(err); err != nil {
-		return err
-	}
-
+	p.failOnError(err)
 	// serialize data
 	marshal, err := json.Marshal(data)
-	if err != nil {
-		return libErrors.NewBadRequestError("Problem serializing data for RabbitMQ message")
-	}
+	p.failOnError(err)
 
 	err = ch.Publish(string(p.exchangeName), string(p.queueName), true, false, amqp.Publishing{
 		ContentType:  "text/plain",
 		DeliveryMode: amqp.Persistent,
 		Body:         marshal,
 	})
-	if err := p.failOnError(err); err != nil {
-		return err
-	}
-	return nil
+	p.failOnError(err)
 }
 
-func (p *EventPublish) failOnError(err error) *libErrors.CustomError {
+func (p *EventPublish) failOnError(err error) {
 	if err != nil {
 		fmt.Printf("[publisher:%v]: Publisher error: %v | queue:%v", p.publisherName, p.exchangeName, p.queueName)
-		return libErrors.NewEventPublisherError(err.Error())
 	}
-	return nil
 }

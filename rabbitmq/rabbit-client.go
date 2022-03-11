@@ -18,6 +18,7 @@ func (r RabbitClient) Connect() *amqp.Connection {
 	conn, err := amqp.Dial(r.rabbitUrl)
 	if err != nil {
 		fmt.Printf("[rabbit:%v]: Failed to connect", r.clientName)
+		return nil
 	}
 	defer conn.Close()
 	return conn

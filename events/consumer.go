@@ -52,7 +52,7 @@ func (c *EventConsumer) Listen(key string) {
 		for delivery := range msg {
 			err := delivery.Ack(false)
 			if err != nil {
-				fmt.Printf("[consumer:%v] Failed to acknowledge message on: %v | queue:%v | msg: %v", c.exchangeName, c.queueName, delivery.Body, err.Error())
+				fmt.Printf("[consumer:%v] Failed to acknowledge message on: %v | queue:%v | msg: %v\n", c.exchangeName, c.queueName, delivery.Body, err.Error())
 			}
 		}
 	}()
@@ -61,7 +61,7 @@ func (c *EventConsumer) Listen(key string) {
 
 func (c *EventConsumer) failOnError(err error, channel *amqp.Channel) {
 	if err != nil {
-		fmt.Printf("[consumer:%v]: Publisher error: %v | queue:%v | Closing channel", c.consumerName, c.exchangeName, c.queueName)
+		fmt.Printf("[consumer:%v]: Publisher error: %v | queue:%v | Closing channel\n", c.consumerName, c.exchangeName, c.queueName)
 		channel.Close()
 	}
 }

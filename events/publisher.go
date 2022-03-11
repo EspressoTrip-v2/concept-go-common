@@ -63,7 +63,7 @@ func (p *EventPublish) Publish(data interface{}) *libErrors.CustomError {
 
 func (p *EventPublish) failOnError(err error) *libErrors.CustomError {
 	if err != nil {
-		fmt.Printf("[publisher:%v]: Publisher error: %v | queue:%v", p.publisherName, p.exchangeName, p.queueName)
+		fmt.Printf("[publisher:%v]: Publisher error: %v | queue:%v\n", p.publisherName, p.exchangeName, p.queueName)
 		return libErrors.NewEventPublisherError(err.Error())
 	}
 	return nil

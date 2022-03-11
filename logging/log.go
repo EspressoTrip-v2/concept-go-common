@@ -6,6 +6,7 @@ import (
 	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeNames"
 	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeTypes"
 	"github.com/EspressoTrip-v2/concept-go-common/exchange/queue/queueInfo"
+	libErrors "github.com/EspressoTrip-v2/concept-go-common/lib-errors"
 	"github.com/EspressoTrip-v2/concept-go-common/logcodes"
 	"github.com/EspressoTrip-v2/concept-go-common/microservice/microserviceNames"
 	"github.com/streadway/amqp"
@@ -32,25 +33,33 @@ func NewLogPublish(rabbitConnection *amqp.Connection, serviceName microserviceNa
 	}
 }
 
-func (l LogPublish) Publish(data interface{}) {
-
+func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
 	ch, err := l.rabbitConnection.Channel()
-	l.failOnError(err)
+	if err := l.failOnError(err); err != nil {
+		return err
+	}
 	defer ch.Close()
 
 	// declare the exchange if it does not exist
 	err = ch.ExchangeDeclare(string(l.exchangeName), string(l.exchangeType), true, false, false, false, nil)
-	l.failOnError(err)
+	if err := l.failOnError(err); err != nil {
+		return err
+	}
 	// serialize data
 	marshal, err := json.Marshal(data)
-	l.failOnError(err)
+	if err := l.failOnError(err); err != nil {
+		return err
+	}
 
 	err = ch.Publish(string(l.exchangeName), string(l.queueName), true, false, amqp.Publishing{
 		ContentType:  "text/plain",
 		DeliveryMode: amqp.Persistent,
 		Body:         marshal,
 	})
-	l.failOnError(err)
+	if err := l.failOnError(err); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (l LogPublish) Log(errCode logcodes.LogCodes, message string, origin string, details string) {
@@ -66,8 +75,10 @@ func (l LogPublish) Log(errCode logcodes.LogCodes, message string, origin string
 
 }
 
-func (l *LogPublish) failOnError(err error) {
+func (l *LogPublish) failOnError(err error) *libErrors.CustomError {
 	if err != nil {
-		fmt.Printf("[publisher:%v]: Publisher error: %v | queue:%v", l.publisherName, l.exchangeName, l.queueName)
+		fmt.Printf("[publisher:%v]: Publisher error: %v | queue:%v\n", l.publisherName, l.exchangeName, l.queueName)
+		return libErrors.NewEventPublisherError(err.Error())
 	}
+	return nil
 }

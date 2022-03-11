@@ -34,7 +34,6 @@ func NewEventPublish(rabbitConnection *amqp.Connection, exchangeName exchangeNam
 
 func (p *EventPublish) Publish(data interface{}) *libErrors.CustomError {
 	ch, err := p.rabbitConnection.Channel()
-	fmt.Println("connection made")
 	if err := p.failOnError(err); err != nil {
 		return err
 	}
@@ -42,7 +41,6 @@ func (p *EventPublish) Publish(data interface{}) *libErrors.CustomError {
 
 	// declare the exchange if it does not exist
 	err = ch.ExchangeDeclare(string(p.exchangeName), string(p.exchangeType), true, false, false, false, nil)
-	fmt.Println("exchange made")
 	if err := p.failOnError(err); err != nil {
 		return err
 	}
@@ -51,7 +49,6 @@ func (p *EventPublish) Publish(data interface{}) *libErrors.CustomError {
 	if err := p.failOnError(err); err != nil {
 		return err
 	}
-	fmt.Println("marshal made")
 
 	err = ch.Publish(string(p.exchangeName), string(p.queueName), true, false, amqp.Publishing{
 		ContentType:  "text/plain",

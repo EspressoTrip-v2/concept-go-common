@@ -75,10 +75,9 @@ func (l LogPublish) Log(errCode logcodes.LogCodes, message string, origin string
 
 }
 
-
 func (l *LogPublish) failOnError(err error) *libErrors.CustomError {
 	if err != nil {
-		fmt.Printf("[publisher:%v]: Publisher error: %v | queue:%v | error: %v", l.publisherName, l.exchangeName, l.queueName, err.Error())
+		fmt.Printf("[publisher:%v]: Publisher error: %v | queue:%v | error: %v\n", l.publisherName, l.exchangeName, l.queueName, err.Error())
 		return libErrors.NewEventPublisherError(err.Error())
 	}
 	return nil

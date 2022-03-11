@@ -6,6 +6,10 @@ import (
 	"github.com/streadway/amqp"
 )
 
+type Publisher interface {
+	Publish(data interface{})
+}
+
 type EventPublish struct {
 	rabbitConnection *amqp.Connection
 	exchangeName     ExchangeNames

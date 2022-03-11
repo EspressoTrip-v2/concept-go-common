@@ -47,7 +47,6 @@ func (l LogPublish) Publish(data interface{}) {
 		Body:         marshal,
 	})
 	l.failOnError(err)
-
 }
 
 func (l LogPublish) Log(errCode LogCodes, message string, origin string, details string) {

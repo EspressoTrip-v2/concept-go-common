@@ -10,7 +10,6 @@ import (
 	"github.com/EspressoTrip-v2/concept-go-common/logcodes"
 	"github.com/EspressoTrip-v2/concept-go-common/microservice/microserviceNames"
 	"github.com/streadway/amqp"
-	"reflect"
 	"time"
 )
 
@@ -59,6 +58,8 @@ func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
 	})
 	if err := l.failOnError(err); err != nil {
 		return err
+	} else {
+		fmt.Printf("[publisher:%v]: Messgae published: %v | queue:%v\n", l.publisherName, l.exchangeName, l.queueName)
 	}
 	return nil
 }
@@ -72,10 +73,7 @@ func (l LogPublish) Log(errCode logcodes.LogCodes, message string, origin string
 		Details:    details,
 		Date:       fmt.Sprint(time.Now().Format(time.RFC3339)),
 	}
-	err := l.Publish(msg)
-	fmt.Println(reflect.TypeOf(err))
-	fmt.Println(err.Message)
-
+	l.Publish(msg)
 }
 
 func (l *LogPublish) failOnError(err error) *libErrors.CustomError {

@@ -3,26 +3,30 @@ package logging
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/EspressoTrip-v2/concept-go-common/events"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeNames"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeTypes"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/queue/queueInfo"
+	"github.com/EspressoTrip-v2/concept-go-common/logcodes"
+	"github.com/EspressoTrip-v2/concept-go-common/microservice/microserviceNames"
 	"github.com/streadway/amqp"
 	"time"
 )
 
 type LogPublish struct {
 	rabbitConnection *amqp.Connection
-	exchangeName     events.ExchangeNames
-	exchangeType     events.ExchangeType
-	queueName        events.QueueInfo
+	exchangeName     exchangeNames.ExchangeNames
+	exchangeType     exchangeTypes.ExchangeType
+	queueName        queueInfo.QueueInfo
 	publisherName    string
-	serviceName      events.MicroserviceNames
+	serviceName      microserviceNames.MicroserviceNames
 }
 
-func NewLogPublish(rabbitConnection *amqp.Connection, serviceName events.MicroserviceNames) *LogPublish {
+func NewLogPublish(rabbitConnection *amqp.Connection, serviceName microserviceNames.MicroserviceNames) *LogPublish {
 	return &LogPublish{
 		rabbitConnection: rabbitConnection,
-		exchangeName:     events.LOG,
-		exchangeType:     events.DIRECT,
-		queueName:        events.LOG_EVENT,
+		exchangeName:     exchangeNames.LOG,
+		exchangeType:     exchangeTypes.DIRECT,
+		queueName:        queueInfo.LOG_EVENT,
 		publisherName:    "log-publisher",
 		serviceName:      serviceName,
 	}
@@ -49,7 +53,7 @@ func (l LogPublish) Publish(data interface{}) {
 	l.failOnError(err)
 }
 
-func (l LogPublish) Log(errCode LogCodes, message string, origin string, details string) {
+func (l LogPublish) Log(errCode logcodes.LogCodes, message string, origin string, details string) {
 	msg := LogMsg{
 		Service:    string(l.serviceName),
 		LogContext: string(errCode),

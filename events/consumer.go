@@ -2,20 +2,24 @@ package events
 
 import (
 	"fmt"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeNames"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeTypes"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/queue/queueInfo"
+	"github.com/EspressoTrip-v2/concept-go-common/microservice/microserviceNames"
 	"github.com/streadway/amqp"
 )
 
 type EventConsumer struct {
 	rabbitConnection *amqp.Connection
-	exchangeName     ExchangeNames
-	exchangeType     ExchangeType
-	queueName        QueueInfo
+	exchangeName     exchangeNames.ExchangeNames
+	exchangeType     exchangeTypes.ExchangeType
+	queueName        queueInfo.QueueInfo
 	consumerName     string
-	serviceName      MicroserviceNames
+	serviceName      microserviceNames.MicroserviceNames
 }
 
-func NewEventConsumer(rabbitConnection *amqp.Connection, exchangeName ExchangeNames, exchangeType ExchangeType,
-	queueName QueueInfo, consumerName string, serviceName MicroserviceNames) *EventConsumer {
+func NewEventConsumer(rabbitConnection *amqp.Connection, exchangeName exchangeNames.ExchangeNames, exchangeType exchangeTypes.ExchangeType,
+	queueName queueInfo.QueueInfo, consumerName string, serviceName microserviceNames.MicroserviceNames) *EventConsumer {
 	return &EventConsumer{rabbitConnection: rabbitConnection, exchangeName: exchangeName, exchangeType: exchangeType,
 		queueName: queueName, consumerName: consumerName, serviceName: serviceName}
 }

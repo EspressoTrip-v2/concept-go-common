@@ -3,6 +3,10 @@ package events
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeNames"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeTypes"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/queue/queueInfo"
+	"github.com/EspressoTrip-v2/concept-go-common/microservice/microserviceNames"
 	"github.com/streadway/amqp"
 )
 
@@ -12,15 +16,15 @@ type Publisher interface {
 
 type EventPublish struct {
 	rabbitConnection *amqp.Connection
-	exchangeName     ExchangeNames
-	exchangeType     ExchangeType
-	queueName        QueueInfo
+	exchangeName     exchangeNames.ExchangeNames
+	exchangeType     exchangeTypes.ExchangeType
+	queueName        queueInfo.QueueInfo
 	publisherName    string
-	serviceName      MicroserviceNames
+	serviceName      microserviceNames.MicroserviceNames
 }
 
-func NewEventPublish(rabbitConnection *amqp.Connection, exchangeName ExchangeNames, exchangeType ExchangeType,
-	queueName QueueInfo, publisherName string, serviceName MicroserviceNames) *EventPublish {
+func NewEventPublish(rabbitConnection *amqp.Connection, exchangeName exchangeNames.ExchangeNames, exchangeType exchangeTypes.ExchangeType,
+	queueName queueInfo.QueueInfo, publisherName string, serviceName microserviceNames.MicroserviceNames) *EventPublish {
 
 	return &EventPublish{rabbitConnection: rabbitConnection, exchangeName: exchangeName,
 		exchangeType: exchangeType, queueName: queueName, publisherName: publisherName, serviceName: serviceName}

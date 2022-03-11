@@ -10,6 +10,7 @@ import (
 	"github.com/EspressoTrip-v2/concept-go-common/logcodes"
 	"github.com/EspressoTrip-v2/concept-go-common/microservice/microserviceNames"
 	"github.com/streadway/amqp"
+	"reflect"
 	"time"
 )
 
@@ -71,7 +72,9 @@ func (l LogPublish) Log(errCode logcodes.LogCodes, message string, origin string
 		Details:    details,
 		Date:       fmt.Sprint(time.Now().Format(time.RFC3339)),
 	}
-	l.Publish(msg)
+	err := l.Publish(msg)
+	fmt.Println(reflect.TypeOf(err))
+	fmt.Println(err.Message)
 
 }
 

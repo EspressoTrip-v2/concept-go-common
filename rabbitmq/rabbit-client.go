@@ -2,11 +2,12 @@ package rabbitmq
 
 import (
 	"fmt"
+	libErrors "github.com/EspressoTrip-v2/concept-go-common/lib-errors"
 	"github.com/streadway/amqp"
 )
 
 type Rabbiter interface {
-	Connect() *amqp.Connection
+	Connect() (*amqp.Connection, *libErrors.CustomError)
 }
 
 type RabbitClient struct {
@@ -14,14 +15,15 @@ type RabbitClient struct {
 	clientName string
 }
 
-func (r RabbitClient) Connect() *amqp.Connection {
+func (r RabbitClient) Connect() (*amqp.Connection, *libErrors.CustomError) {
 	conn, err := amqp.Dial(r.rabbitUrl)
 	if err != nil {
 		fmt.Printf("[rabbit:%v]: Failed to connect", r.clientName)
-		return nil
+
+		return nil, libErrors.NewDatabaseError(err.Error())
 	}
 	defer conn.Close()
-	return conn
+	return conn, nil
 }
 
 func NewRabbitClient(rabbitUrl string, clientName string) *RabbitClient {

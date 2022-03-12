@@ -38,3 +38,4 @@ func GetRabbitConnection() (*amqp.Connection, *libErrors.CustomError) {
 	}
 	return rabbitClient.connection, nil
 }
+

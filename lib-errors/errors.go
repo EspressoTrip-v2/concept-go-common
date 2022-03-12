@@ -63,6 +63,14 @@ func NewDatabaseError(msg string) *CustomError {
 	}
 }
 
+func NewRabbitConnectionError(msg string) *CustomError {
+	return &CustomError{
+		ErrorType: INTERNAL,
+		Status:    http.StatusInternalServerError,
+		Message:   msg,
+	}
+}
+
 func NewElevatedAuthError() *CustomError {
 	return &CustomError{
 		ErrorType: INVALID_ROLE,

@@ -1,33 +1,40 @@
 package rabbitmq
 
 import (
-	"fmt"
 	libErrors "github.com/EspressoTrip-v2/concept-go-common/lib-errors"
 	"github.com/streadway/amqp"
 )
 
-type RabbitClient struct {
-	rabbitUrl  string
+var rabbitClient *rabbitConfig
+
+type rabbitConfig struct {
+	connection *amqp.Connection
 	clientName string
 }
 
-func (r RabbitClient) Connect() (*amqp.Connection, *libErrors.CustomError) {
-	conn, err := amqp.Dial(r.rabbitUrl)
-	r.failOnError(err, conn)
-
-	fmt.Printf("[%v:rabbitmq]: Connected successfully\n", r.clientName)
-	return conn, nil
-}
-
-func (r *RabbitClient) failOnError(err error, conn *amqp.Connection) *libErrors.CustomError {
-	if err != nil {
-		fmt.Printf("[rabbit:%v]: Connection error: %v\n", r.clientName, err.Error())
-		conn.Close()
-		return libErrors.NewEventPublisherError(err.Error())
+func StartRabbitClient(rabbitUri string, clientName string) (*amqp.Connection, *libErrors.CustomError) {
+	var conn *amqp.Connection
+	var err error
+	if rabbitClient == nil {
+		rabbitClient = &rabbitConfig{
+			connection: nil,
+			clientName: clientName,
+		}
+		if conn, err = amqp.Dial(rabbitUri); err != nil {
+			return nil, libErrors.NewRabbitConnectionError("Rabbit connection error")
+		}
+		rabbitClient.connection = conn
 	}
-	return nil
+	return rabbitClient.connection, nil
 }
 
-func NewRabbitClient(rabbitUrl string, clientName string) *RabbitClient {
-	return &RabbitClient{rabbitUrl: rabbitUrl, clientName: clientName}
+func IsConnected() bool {
+	return !rabbitClient.connection.IsClosed()
+}
+
+func GetRabbitConnection() (*amqp.Connection, *libErrors.CustomError) {
+	if rabbitClient == nil {
+		return nil, libErrors.NewRabbitConnectionError("Rabbit connection does not exist")
+	}
+	return rabbitClient.connection, nil
 }

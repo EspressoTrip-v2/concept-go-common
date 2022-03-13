@@ -1,3 +1,4 @@
+// Package exchangeTypes constant exchange types
 package exchangeTypes
 
 type ExchangeType string

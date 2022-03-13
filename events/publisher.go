@@ -13,6 +13,7 @@ import (
 
 type Publisher interface {
 	Publish(data interface{}) *libErrors.CustomError
+	failOnError(err error) *libErrors.CustomError
 }
 
 type EventPublish struct {
@@ -24,6 +25,7 @@ type EventPublish struct {
 	serviceName      microserviceNames.MicroserviceNames
 }
 
+// NewEventPublish creates a new publisher to use
 func NewEventPublish(rabbitConnection *amqp.Connection, exchangeName exchangeNames.ExchangeNames, exchangeType exchangeTypes.ExchangeType,
 	queueName queueInfo.QueueInfo, publisherName string, serviceName microserviceNames.MicroserviceNames) *EventPublish {
 
@@ -32,6 +34,7 @@ func NewEventPublish(rabbitConnection *amqp.Connection, exchangeName exchangeNam
 
 }
 
+// Publish publishes the message to RabbitMQ this is usually chained to NewEventPublish
 func (p *EventPublish) Publish(data interface{}) *libErrors.CustomError {
 	ch, err := p.rabbitConnection.Channel()
 	if err := p.failOnError(err); err != nil {

@@ -1,3 +1,4 @@
+// Package exchangeNames constant exchange names
 package exchangeNames
 
 type ExchangeNames string

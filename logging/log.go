@@ -13,6 +13,21 @@ import (
 	"time"
 )
 
+type Logger interface {
+	Publish(data interface{}) *libErrors.CustomError
+	Log(errCode logcodes.LogCodes, message string, origin string, details string)
+	failOnError(err error) *libErrors.CustomError
+}
+
+// LogPublish  is a new publisher for logging, it is best used by embedding it into a local struct
+// like below:
+//
+// 		type localLoggerConfig struct {
+//			serviceName microserviceNames.MicroserviceNames
+//			logger      *logging.LogPublish
+//		}
+//
+// This way you can serve it like a singleton
 type LogPublish struct {
 	rabbitConnection *amqp.Connection
 	exchangeName     exchangeNames.ExchangeNames
@@ -22,6 +37,7 @@ type LogPublish struct {
 	serviceName      microserviceNames.MicroserviceNames
 }
 
+// NewLogPublish creates a new publisher
 func NewLogPublish(rabbitConnection *amqp.Connection, serviceName microserviceNames.MicroserviceNames) *LogPublish {
 	return &LogPublish{
 		rabbitConnection: rabbitConnection,
@@ -59,7 +75,7 @@ func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
 	if err := l.failOnError(err); err != nil {
 		return err
 	} else {
-		fmt.Printf("[publisher:%v]: Messgae published: %v | queue:%v\n", l.publisherName, l.exchangeName, l.queueName)
+		fmt.Printf("[publisher:%v]: Message published: %v | queue:%v\n", l.publisherName, l.exchangeName, l.queueName)
 	}
 	return nil
 }

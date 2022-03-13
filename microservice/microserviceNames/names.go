@@ -1,3 +1,4 @@
+// Package microserviceNames constants for microservice names
 package microserviceNames
 
 type MicroserviceNames string

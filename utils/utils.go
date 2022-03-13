@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+// WriteResponse is a convenience method for json response replies in Gorilla mux
+// it adds the requited Content-Type and header code
 func WriteResponse(w http.ResponseWriter, code int, data interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)

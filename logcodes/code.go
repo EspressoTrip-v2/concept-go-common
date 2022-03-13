@@ -1,3 +1,4 @@
+// Package logcodes logging codes to be use for LogContext
 package logcodes
 
 type LogCodes string

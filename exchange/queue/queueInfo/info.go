@@ -1,3 +1,4 @@
+// Package queueInfo constant queue names
 package queueInfo
 
 type QueueInfo string

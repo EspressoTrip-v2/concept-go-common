@@ -1,6 +1,11 @@
 package libErrors
 
-import "net/http"
+import (
+	"fmt"
+	"google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
+	"net/http"
+)
 
 type ErrorTypes string
 
@@ -124,5 +129,26 @@ func NewEnvError() *CustomError {
 		ErrorType: ENV,
 		Status:    http.StatusNotImplemented,
 		Message:   "Missing required env variable",
+	}
+}
+
+func GrpcTranslator(grpcStatus error) *CustomError {
+	respErr, ok := status.FromError(grpcStatus)
+	fmt.Printf("Details: %v", respErr.Details())
+	if ok == true {
+		switch eTYpe := respErr.Code(); eTYpe {
+		case codes.AlreadyExists, codes.Unknown:
+			return NewBadRequestError(respErr.Message())
+		case codes.NotFound:
+			return NewNotFoundError(respErr.Message())
+		case codes.PermissionDenied:
+			return NewNotAuthorizedError()
+		case codes.Internal:
+			return NewDatabaseError(respErr.Message())
+		default:
+			return NewBadRequestError(respErr.Message())
+		}
+	} else {
+		return NewBadRequestError(grpcStatus.Error())
 	}
 }

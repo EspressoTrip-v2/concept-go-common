@@ -9,6 +9,11 @@ import (
 	"github.com/streadway/amqp"
 )
 
+type Consumer interface {
+	Listen(key string)
+	failOnError(err error, channel *amqp.Channel)
+}
+
 type EventConsumer struct {
 	rabbitConnection *amqp.Connection
 	exchangeName     exchangeNames.ExchangeNames
@@ -18,6 +23,7 @@ type EventConsumer struct {
 	serviceName      microserviceNames.MicroserviceNames
 }
 
+// NewEventConsumer creates a new consumer
 func NewEventConsumer(rabbitConnection *amqp.Connection, exchangeName exchangeNames.ExchangeNames, exchangeType exchangeTypes.ExchangeType,
 	queueName queueInfo.QueueInfo, consumerName string, serviceName microserviceNames.MicroserviceNames) *EventConsumer {
 	return &EventConsumer{rabbitConnection: rabbitConnection, exchangeName: exchangeName, exchangeType: exchangeType,
@@ -37,7 +43,7 @@ func (c *EventConsumer) Listen(key string) {
 	// declare exchange if not exists
 	err = ch.ExchangeDeclare(string(c.exchangeName), string(c.exchangeType), true, false, false, false, nil)
 	c.failOnError(err, ch)
-	defer ch.Close() // TODO: CHECK THIS
+	defer ch.Close()
 
 	// declare a queue if not exists
 	q, err := ch.QueueDeclare(string(c.queueName), true, false, true, false, nil)
@@ -62,6 +68,5 @@ func (c *EventConsumer) Listen(key string) {
 func (c *EventConsumer) failOnError(err error, channel *amqp.Channel) {
 	if err != nil {
 		fmt.Printf("[consumer:%v]: Publisher error: %v | queue:%v | Closing channel\n", c.consumerName, c.exchangeName, c.queueName)
-		channel.Close()
 	}
 }

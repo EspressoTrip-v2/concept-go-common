@@ -1,4 +1,4 @@
-package grpcChannel
+package grpchannel
 
 type GrpcConnectionStatus int
 

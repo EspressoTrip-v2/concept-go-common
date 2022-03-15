@@ -1,4 +1,4 @@
-package grpcPorts
+package grpcports
 
 type GrpcServicePortDns string
 

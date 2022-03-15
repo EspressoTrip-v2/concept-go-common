@@ -6,7 +6,7 @@ import (
 	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeNames"
 	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeTypes"
 	"github.com/EspressoTrip-v2/concept-go-common/exchange/queue/queueInfo"
-	libErrors "github.com/EspressoTrip-v2/concept-go-common/lib-errors"
+	libErrors "github.com/EspressoTrip-v2/concept-go-common/liberrors"
 	"github.com/EspressoTrip-v2/concept-go-common/logcodes"
 	"github.com/EspressoTrip-v2/concept-go-common/microservice/microserviceNames"
 	"github.com/streadway/amqp"

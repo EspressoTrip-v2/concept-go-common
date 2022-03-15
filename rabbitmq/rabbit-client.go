@@ -1,7 +1,7 @@
 package rabbitmq
 
 import (
-	libErrors "github.com/EspressoTrip-v2/concept-go-common/lib-errors"
+	libErrors "github.com/EspressoTrip-v2/concept-go-common/liberrors"
 	"github.com/streadway/amqp"
 )
 

@@ -37,7 +37,7 @@ type ErrorObject struct {
 }
 
 func (e CustomError) GetErrors() []ErrorObject {
-	return []ErrorObject{{Error{
+	return []ErrorObject{{error: Error{
 		Type:    e.ErrorType,
 		Message: e.Message,
 		Status:  e.Status,

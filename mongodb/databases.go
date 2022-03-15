@@ -1,10 +1,10 @@
 package mongodb
 
-type DatabaseNAmes string
+type DatabaseNames string
 
 const (
-	TASK_DB     DatabaseNAmes = "task"
-	EMPLOYEE_DB DatabaseNAmes = "employee"
-	DIVISION_DB DatabaseNAmes = "division"
-	USER_DB     DatabaseNAmes = "user"
+	TASK_DB     DatabaseNames = "task"
+	EMPLOYEE_DB DatabaseNames = "employee"
+	DIVISION_DB DatabaseNames = "division"
+	USER_DB     DatabaseNames = "user"
 )

@@ -33,11 +33,11 @@ type Error struct {
 	Status  int        `json:"status"`
 }
 type ErrorObject struct {
-	error Error
+	Error Error `json:"error"`
 }
 
 func (e CustomError) GetErrors() []ErrorObject {
-	return []ErrorObject{{error: Error{
+	return []ErrorObject{{Error: Error{
 		Type:    e.ErrorType,
 		Message: e.Message,
 		Status:  e.Status,

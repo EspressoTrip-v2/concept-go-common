@@ -35,6 +35,8 @@ func (c *EventConsumer) Listen(key string) {
 	var k string
 	if key != "" {
 		k = key
+	} else {
+		k = string(c.queueName)
 	}
 	// connect to the rabbit instance
 	ch, err := c.rabbitConnection.Channel()

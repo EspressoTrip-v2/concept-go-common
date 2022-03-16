@@ -137,7 +137,7 @@ func GrpcTranslator(grpcStatus error) *CustomError {
 	fmt.Printf("Details: %v", respErr.Details())
 	if ok == true {
 		switch eTYpe := respErr.Code(); eTYpe {
-		case codes.AlreadyExists, codes.Unknown:
+		case codes.AlreadyExists, codes.Unknown, codes.InvalidArgument:
 			return NewBadRequestError(respErr.Message())
 		case codes.NotFound:
 			return NewNotFoundError(respErr.Message())

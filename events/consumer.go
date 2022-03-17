@@ -99,6 +99,8 @@ func (c *EventConsumer) Listen(processFunc ProcessFunc) {
 
 }
 
+
+
 func (c *EventConsumer) failOnError(err error) *libErrors.CustomError {
 	if err != nil {
 		fmt.Printf("[consumer:%v]: Publisher error: %v | queue:%v | Closing channel\n", c.consumerName, c.exchangeName, c.queueName)

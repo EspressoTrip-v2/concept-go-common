@@ -29,7 +29,7 @@ func NewEventConsumer(rabbitConnection *amqp.Connection, exchangeName exchangeNa
 		queueName: queueName, consumerName: consumerName, serviceName: serviceName}
 }
 
-type ProcessFunc func(msg amqp.Delivery)
+type ProcessFunc func(msg amqp.Delivery) error
 
 func (c *EventConsumer) Listen(key string, processFunc ProcessFunc) {
 	var k string
@@ -45,6 +45,7 @@ func (c *EventConsumer) Listen(key string, processFunc ProcessFunc) {
 	// declare exchange if not exists
 	err = ch.ExchangeDeclare(string(c.exchangeName), string(c.exchangeType), true, false, false, false, nil)
 	c.failOnError(err, ch)
+	fmt.Printf("[consumer:%v]: Subscribed on queue:%v\n", c.consumerName, c.queueName)
 	defer ch.Close()
 
 	// declare a queue if not exists
@@ -59,14 +60,16 @@ func (c *EventConsumer) Listen(key string, processFunc ProcessFunc) {
 	go func() {
 		// Receive messages
 		for msg := range deliveredMsg {
-			processFunc(msg)
-			err := msg.Ack(false)
-			if err != nil {
-				fmt.Printf("[consumer:%v] Failed to acknowledge message on: %v | queue:%v | msg: %v\n", c.exchangeName, c.queueName, msg.Body, err.Error())
+			fmt.Printf("[consumer:%v]: Message received: %v | queue:%v\n", c.consumerName, c.exchangeName, c.queueName)
+			err := processFunc(msg)
+			if err == nil {
+				err := msg.Ack(false)
+				if err != nil {
+					fmt.Printf("[consumer:%v] Failed to acknowledge message on: %v | queue:%v | msg: %v\n", c.exchangeName, c.queueName, msg.Body, err.Error())
+				}
 			}
 		}
 	}()
-
 	<-forever
 }
 

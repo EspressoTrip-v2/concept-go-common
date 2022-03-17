@@ -29,7 +29,7 @@ func NewEventConsumer(rabbitConnection *amqp.Connection, exchangeName exchangeNa
 		queueName: queueName, consumerName: consumerName, serviceName: serviceName}
 }
 
-type ProcessFunc func(interface{})
+type ProcessFunc func(msg amqp.Delivery)
 
 func (c *EventConsumer) Listen(key string, processFunc ProcessFunc) {
 	var k string

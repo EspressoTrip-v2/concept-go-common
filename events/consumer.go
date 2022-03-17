@@ -68,7 +68,7 @@ func (c *EventConsumer) Connect(key string) (*EventConsumer, *libErrors.CustomEr
 	if libError != nil {
 		return nil, libError
 	}
-	err = c.channel.QueueBind(q.Name, k, string(c.exchangeName), false, nil)
+	err = c.channel.QueueBind(string(c.queueName), k, string(c.exchangeName), false, nil)
 	libError = c.failOnError(err)
 	if libError != nil {
 		return nil, libError
@@ -104,4 +104,5 @@ func (c *EventConsumer) failOnError(err error) *libErrors.CustomError {
 		fmt.Printf("[consumer:%v]: Publisher error: %v | queue:%v | Closing channel\n", c.consumerName, c.exchangeName, c.queueName)
 		return libErrors.NewEventConsumerError(err.Error())
 	}
+	return nil
 }

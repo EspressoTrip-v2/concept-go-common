@@ -63,7 +63,7 @@ func (c *EventConsumer) Connect(key string) (*EventConsumer, *libErrors.CustomEr
 	fmt.Printf("[consumer:%v]: Subscribed on queue:%v\n", c.consumerName, c.queueName)
 
 	// declare a queue if not exists
-	_, err = c.channel.QueueDeclare(string(c.queueName), true, false, true, false, nil)
+	_, err = c.channel.QueueDeclare(string(c.queueName), true, false, false, false, nil)
 	libError = c.failOnError(err)
 	if libError != nil {
 		return nil, libError
@@ -100,8 +100,6 @@ func (c *EventConsumer) Listen(processFunc ProcessFunc) {
 	<-forever
 
 }
-
-
 
 func (c *EventConsumer) failOnError(err error) *libErrors.CustomError {
 	if err != nil {

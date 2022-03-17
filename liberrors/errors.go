@@ -16,6 +16,7 @@ const (
 	INVALID_ROLE       ErrorTypes = "INVALID_ROLE"
 	INTERNAL           ErrorTypes = "INTERNAL"
 	EVENT_PUBLISH      ErrorTypes = "EVENT_PUBLISH"
+	EVENT_CONSUMER     ErrorTypes = "EVENT_CONSUMER"
 	PAYLOAD_VALIDATION ErrorTypes = "PAYLOAD_VALIDATION"
 	PAYLOAD_ENCRYPTION ErrorTypes = "PAYLOAD_ENCRYPTION"
 	ENV                ErrorTypes = "ENV"
@@ -87,6 +88,14 @@ func NewElevatedAuthError() *CustomError {
 func NewEventPublisherError(msg string) *CustomError {
 	return &CustomError{
 		ErrorType: EVENT_PUBLISH,
+		Status:    http.StatusInternalServerError,
+		Message:   msg,
+	}
+}
+
+func NewEventConsumerError(msg string) *CustomError {
+	return &CustomError{
+		ErrorType: EVENT_CONSUMER,
 		Status:    http.StatusInternalServerError,
 		Message:   msg,
 	}

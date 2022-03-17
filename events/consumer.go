@@ -31,7 +31,7 @@ func NewEventConsumer(rabbitConnection *amqp.Connection, exchangeName exchangeNa
 
 type ProcessFunc func(interface{})
 
-func (c *EventConsumer) Listen(key string, processFunc *ProcessFunc) {
+func (c *EventConsumer) Listen(key string, processFunc ProcessFunc) {
 	var k string
 	if key != "" {
 		k = key

@@ -78,7 +78,7 @@ func (c *EventConsumer) Connect(key string) (*EventConsumer, *libErrors.CustomEr
 
 func (c *EventConsumer) Listen(processFunc ProcessFunc) {
 
-	deliveredMsg, err := c.channel.Consume(string(c.queueName), "", false, false, false, false, nil)
+	deliveredMsg, err := c.channel.Consume(string(c.queueName), "", true, false, false, false, nil)
 	if err != nil {
 		c.logger.Log(logcodes.ERROR, fmt.Sprintf("go-common library -> Error consumer connecting to queue:%v\n", c.queueName), "events/consumer.go:83", err.Error())
 	}
@@ -88,12 +88,9 @@ func (c *EventConsumer) Listen(processFunc ProcessFunc) {
 		for msg := range deliveredMsg {
 			fmt.Printf("[consumer:%v]: Message received: %v | queue:%v\n", c.consumerName, c.exchangeName, c.queueName)
 			err := processFunc(msg)
-			if err == nil {
-				err := msg.Ack(false)
-				if err != nil {
-					c.logger.Log(logcodes.ERROR, fmt.Sprintf("go-common library -> Failed to acknowledge message on: %v | queue:%v", c.exchangeName, c.queueName), "events/consumer.go:95", err.Error())
-					fmt.Printf("[consumer:%v] Failed to acknowledge message on: %v | queue:%v | msg: %v\n", c.exchangeName, c.queueName, msg.Body, err.Error())
-				}
+			if err != nil {
+				c.logger.Log(logcodes.ERROR,
+					fmt.Sprintf("go-common library -> Failed process message: %v | queue:%v", c.exchangeName, c.queueName), "events/consumer.go:95", err.Error())
 			}
 		}
 	}()

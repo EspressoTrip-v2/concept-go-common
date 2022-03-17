@@ -96,6 +96,7 @@ func (c *EventConsumer) Listen(processFunc ProcessFunc) {
 			}
 		}
 	}()
+
 }
 
 func (c *EventConsumer) failOnError(err error) *libErrors.CustomError {

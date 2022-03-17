@@ -82,6 +82,7 @@ func (c *EventConsumer) Listen(processFunc ProcessFunc) {
 	if err != nil {
 		c.logger.Log(logcodes.ERROR, fmt.Sprintf("go-common library -> Error consumer connecting to queue:%v\n", c.queueName), "events/consumer.go:83", err.Error())
 	}
+	forever := make(chan bool)
 	go func() {
 		// Receive messages
 		for msg := range deliveredMsg {
@@ -96,6 +97,7 @@ func (c *EventConsumer) Listen(processFunc ProcessFunc) {
 			}
 		}
 	}()
+	<-forever
 
 }
 

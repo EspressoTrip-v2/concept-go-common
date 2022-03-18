@@ -37,10 +37,3 @@ func (c RabbitConfig) GetConnection() *amqp.Connection {
 func IsConnected() bool {
 	return !rabbitClient.connection.IsClosed()
 }
-
-func GetRabbitConnection() (*RabbitConfig, *libErrors.CustomError) {
-	if rabbitClient == nil {
-		return nil, libErrors.NewRabbitConnectionError("Rabbit connection does not exist")
-	}
-	return rabbitClient, nil
-}

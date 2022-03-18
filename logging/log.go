@@ -42,7 +42,7 @@ func NewLogPublish(rabbitConnection *amqp.Connection, serviceName microserviceNa
 	return &LogPublish{
 		rabbitConnection: rabbitConnection,
 		exchangeName:     exchangeNames.LOG,
-		exchangeType:     exchangeTypes.DIRECT,
+		exchangeType:     exchangeTypes.FAN_OUT,
 		queueName:        queueInfo.LOG_EVENT,
 		publisherName:    "log-publisher",
 		serviceName:      serviceName,

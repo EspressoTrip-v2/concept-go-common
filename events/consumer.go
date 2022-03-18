@@ -76,7 +76,7 @@ func (c *EventConsumer) Connect(key string) (*EventConsumer, *libErrors.CustomEr
 	return c, nil
 }
 
-func (c *EventConsumer) Listen(processFunc ProcessFunc) {
+func (c *EventConsumer) Listen(consumeChannel chan amqp.Delivery) {
 
 	deliveredMsg, err := c.channel.Consume(string(c.queueName), "", true, false, false, false, nil)
 	if err != nil {
@@ -87,7 +87,7 @@ func (c *EventConsumer) Listen(processFunc ProcessFunc) {
 		// Receive messages
 		for msg := range deliveredMsg {
 			fmt.Printf("[consumer:%v]: Message received: %v | queue:%v\n", c.consumerName, c.exchangeName, c.queueName)
-			err := processFunc(msg)
+			consumeChannel <- msg
 			if err != nil {
 				c.logger.Log(logcodes.ERROR,
 					fmt.Sprintf("go-common library -> Failed process message: %v | queue:%v", c.exchangeName, c.queueName), "events/consumer.go:95", err.Error())

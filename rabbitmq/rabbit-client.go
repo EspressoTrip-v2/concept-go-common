@@ -29,6 +29,11 @@ func StartRabbitClient(rabbitUri string, clientName string) (*RabbitConfig, *lib
 	return rabbitClient, nil
 }
 
+func (c RabbitConfig) GetConnection() *amqp.Connection {
+	return c.connection
+}
+
+
 // IsConnected checks if the client is connected and not closed
 func IsConnected() bool {
 	return !rabbitClient.connection.IsClosed()

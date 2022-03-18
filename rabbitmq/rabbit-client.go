@@ -5,19 +5,19 @@ import (
 	"github.com/streadway/amqp"
 )
 
-var rabbitClient *rabbitConfig
+var rabbitClient *RabbitConfig
 
-type rabbitConfig struct {
+type RabbitConfig struct {
 	connection *amqp.Connection
 	clientName string
 }
 
 // StartRabbitClient connects to the message bus and returns the pointer to the connection
-func StartRabbitClient(rabbitUri string, clientName string) (*amqp.Connection, *libErrors.CustomError) {
+func StartRabbitClient(rabbitUri string, clientName string) (*RabbitConfig, *libErrors.CustomError) {
 	var conn *amqp.Connection
 	var err error
 	if rabbitClient == nil {
-		rabbitClient = &rabbitConfig{
+		rabbitClient = &RabbitConfig{
 			connection: nil,
 			clientName: clientName,
 		}
@@ -26,7 +26,7 @@ func StartRabbitClient(rabbitUri string, clientName string) (*amqp.Connection, *
 		}
 		rabbitClient.connection = conn
 	}
-	return rabbitClient.connection, nil
+	return rabbitClient, nil
 }
 
 // IsConnected checks if the client is connected and not closed

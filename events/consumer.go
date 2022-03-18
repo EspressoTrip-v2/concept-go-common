@@ -63,7 +63,9 @@ func (c *EventConsumer) Connect(key string) (*EventConsumer, *libErrors.CustomEr
 	fmt.Printf("[consumer:%v]: Subscribed on queue:%v\n", c.consumerName, c.queueName)
 
 	// declare a queue if not exists
-	_, err = c.channel.QueueDeclare(string(c.queueName), true, false, false, false, nil)
+	q, err := c.channel.QueueDeclare(string(c.queueName), true, false, false, false, nil)
+	fmt.Println("Que generated ", q.Name)
+	fmt.Println("Que name ", c.queueName)
 	libError = c.failOnError(err)
 	if libError != nil {
 		return nil, libError
@@ -77,13 +79,14 @@ func (c *EventConsumer) Connect(key string) (*EventConsumer, *libErrors.CustomEr
 }
 
 func (c *EventConsumer) Listen(consumeChannel chan amqp.Delivery) {
-
+	fmt.Println("LIstening")
 	deliveredMsg, err := c.channel.Consume(string(c.queueName), "", true, false, false, false, nil)
 	if err != nil {
 		c.logger.Log(logcodes.ERROR, fmt.Sprintf("go-common library -> Error consumer connecting to queue:%v\n", c.queueName), "events/consumer.go:83", err.Error())
 	}
 	forever := make(chan bool)
 	go func() {
+		fmt.Println("GO func run")
 		// Receive messages
 		for msg := range deliveredMsg {
 			fmt.Printf("[consumer:%v]: Message received: %v | queue:%v\n", c.consumerName, c.exchangeName, c.queueName)

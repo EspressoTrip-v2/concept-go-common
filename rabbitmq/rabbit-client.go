@@ -34,15 +34,13 @@ func (c RabbitConfig) GetConnection() *amqp.Connection {
 }
 
 
-// IsConnected checks if the client is connected and not closed
 func IsConnected() bool {
 	return !rabbitClient.connection.IsClosed()
 }
 
-// GetRabbitConnection gets the connection to be passed to what ever requires it
-func GetRabbitConnection() (*amqp.Connection, *libErrors.CustomError) {
+func GetRabbitConnection() (*RabbitConfig, *libErrors.CustomError) {
 	if rabbitClient == nil {
 		return nil, libErrors.NewRabbitConnectionError("Rabbit connection does not exist")
 	}
-	return rabbitClient.connection, nil
+	return rabbitClient, nil
 }

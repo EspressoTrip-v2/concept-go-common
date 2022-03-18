@@ -49,6 +49,8 @@ func NewLogPublish(rabbitConnection *amqp.Connection, serviceName microserviceNa
 	}
 }
 
+
+
 func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
 	ch, err := l.rabbitConnection.Channel()
 	if err := l.failOnError(err); err != nil {

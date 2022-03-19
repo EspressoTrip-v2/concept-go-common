@@ -29,35 +29,30 @@ type Logger interface {
 //
 // This way you can serve it like a singleton
 type LogPublish struct {
-	rabbitConnection *amqp.Connection
-	exchangeName     exchangeNames.ExchangeNames
-	exchangeType     exchangeTypes.ExchangeType
-	queueName        queueInfo.QueueInfo
-	publisherName    string
-	serviceName      microserviceNames.MicroserviceNames
+	rabbitChannel *amqp.Channel
+	exchangeName  exchangeNames.ExchangeNames
+	exchangeType  exchangeTypes.ExchangeType
+	queueName     queueInfo.QueueInfo
+	publisherName string
+	serviceName   microserviceNames.MicroserviceNames
 }
 
 // NewLogPublish creates a new publisher
-func NewLogPublish(rabbitConnection *amqp.Connection, serviceName microserviceNames.MicroserviceNames) *LogPublish {
+func NewLogPublish(rabbitChannel *amqp.Channel, serviceName microserviceNames.MicroserviceNames) *LogPublish {
 	return &LogPublish{
-		rabbitConnection: rabbitConnection,
-		exchangeName:     exchangeNames.LOG,
-		exchangeType:     exchangeTypes.DIRECT,
-		queueName:        queueInfo.LOG_EVENT,
-		publisherName:    "log-publisher",
-		serviceName:      serviceName,
+		rabbitChannel: rabbitChannel,
+		exchangeName:  exchangeNames.LOG,
+		exchangeType:  exchangeTypes.DIRECT,
+		queueName:     queueInfo.LOG_EVENT,
+		publisherName: "log-publisher",
+		serviceName:   serviceName,
 	}
 }
 
 func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
-	ch, err := l.rabbitConnection.Channel()
-	if err := l.failOnError(err); err != nil {
-		return err
-	}
-	defer ch.Close()
-
+	var err error
 	// declare the exchange if it does not exist
-	err = ch.ExchangeDeclare(string(l.exchangeName), string(l.exchangeType), true, false, false, false, nil)
+	err = l.rabbitChannel.ExchangeDeclare(string(l.exchangeName), string(l.exchangeType), true, false, false, false, nil)
 	if err := l.failOnError(err); err != nil {
 		return err
 	}
@@ -67,7 +62,7 @@ func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
 		return err
 	}
 
-	err = ch.Publish(string(l.exchangeName), string(l.queueName), true, false, amqp.Publishing{
+	err = l.rabbitChannel.Publish(string(l.exchangeName), string(l.queueName), true, false, amqp.Publishing{
 		ContentType:  "text/plain",
 		DeliveryMode: amqp.Persistent,
 		Body:         marshal,

@@ -42,14 +42,12 @@ func NewLogPublish(rabbitConnection *amqp.Connection, serviceName microserviceNa
 	return &LogPublish{
 		rabbitConnection: rabbitConnection,
 		exchangeName:     exchangeNames.LOG,
-		exchangeType:     exchangeTypes.FAN_OUT,
+		exchangeType:     exchangeTypes.DIRECT,
 		queueName:        queueInfo.LOG_EVENT,
 		publisherName:    "log-publisher",
 		serviceName:      serviceName,
 	}
 }
-
-
 
 func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
 	ch, err := l.rabbitConnection.Channel()

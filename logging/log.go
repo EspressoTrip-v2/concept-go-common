@@ -3,9 +3,9 @@ package logging
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/EspressoTrip-v2/concept-go-common/exchange/bindkeys"
 	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeNames"
 	"github.com/EspressoTrip-v2/concept-go-common/exchange/exchangeTypes"
-	"github.com/EspressoTrip-v2/concept-go-common/exchange/queue/queueInfo"
 	libErrors "github.com/EspressoTrip-v2/concept-go-common/liberrors"
 	"github.com/EspressoTrip-v2/concept-go-common/logcodes"
 	"github.com/EspressoTrip-v2/concept-go-common/microservice/microserviceNames"
@@ -32,7 +32,7 @@ type LogPublish struct {
 	rabbitChannel *amqp.Channel
 	exchangeName  exchangeNames.ExchangeNames
 	exchangeType  exchangeTypes.ExchangeType
-	queueName     queueInfo.QueueInfo
+	bindKey       bindkeys.BindKey
 	publisherName string
 	serviceName   microserviceNames.MicroserviceNames
 }
@@ -43,8 +43,8 @@ func NewLogPublish(rabbitChannel *amqp.Channel, serviceName microserviceNames.Mi
 		rabbitChannel: rabbitChannel,
 		exchangeName:  exchangeNames.LOG,
 		exchangeType:  exchangeTypes.DIRECT,
-		queueName:     queueInfo.LOG_EVENT,
 		publisherName: "log-publisher",
+		bindKey:       bindkeys.LOG,
 		serviceName:   serviceName,
 	}
 }
@@ -62,7 +62,7 @@ func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
 		return err
 	}
 
-	err = l.rabbitChannel.Publish(string(l.exchangeName), string(l.queueName), true, false, amqp.Publishing{
+	err = l.rabbitChannel.Publish(string(l.exchangeName), string(l.bindKey), true, false, amqp.Publishing{
 		ContentType:  "text/plain",
 		DeliveryMode: amqp.Persistent,
 		Body:         marshal,
@@ -70,7 +70,7 @@ func (l LogPublish) Publish(data interface{}) *libErrors.CustomError {
 	if err := l.failOnError(err); err != nil {
 		return err
 	} else {
-		fmt.Printf("[publisher:%v]: Message published: %v | queue:%v\n", l.publisherName, l.exchangeName, l.queueName)
+		fmt.Printf("[publisher:%v]: Publish:  exchange:%v | route:%v\n", l.publisherName, l.exchangeName, l.bindKey)
 	}
 	return nil
 }
@@ -89,7 +89,7 @@ func (l LogPublish) Log(errCode logcodes.LogCodes, message string, origin string
 
 func (l *LogPublish) failOnError(err error) *libErrors.CustomError {
 	if err != nil {
-		fmt.Printf("[publisher:%v]: Publisher error: %v | queue:%v | error: %v\n", l.publisherName, l.exchangeName, l.queueName, err.Error())
+		fmt.Printf("[publisher:%v]: Publisher error: exchange:%v | route:%v\n", l.publisherName, l.exchangeName, l.bindKey)
 		return libErrors.NewEventPublisherError(err.Error())
 	}
 	return nil

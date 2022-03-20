@@ -7,4 +7,5 @@ const (
 	EMPLOYEE_COL CollectionNames = "employee"
 	DIVISION_COL CollectionNames = "division"
 	USER_COL     CollectionNames = "user"
+	SHIFT_COL    CollectionNames = "shift"
 )

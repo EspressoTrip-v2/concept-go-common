@@ -2,6 +2,7 @@ package libErrors
 
 import (
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	"net/http"
@@ -25,24 +26,24 @@ const (
 type CustomError struct {
 	ErrorType ErrorTypes
 	Status    int
-	Message   string
+	Message   []string
 }
 
-type Error struct {
-	Type    ErrorTypes `json:"type"`
-	Message string     `json:"message"`
-	Status  int        `json:"status"`
-}
 type ErrorObject struct {
-	Error Error `json:"error"`
+	Status int        `json:"status"`
+	Type   ErrorTypes `json:"type"`
+	Error  []string   `json:"error"`
 }
 
-func (e CustomError) GetErrors() []ErrorObject {
-	return []ErrorObject{{Error: Error{
-		Type:    e.ErrorType,
-		Message: e.Message,
-		Status:  e.Status,
-	}}}
+func (e CustomError) GetErrors() ErrorObject {
+	var errorObj ErrorObject
+	for _, msg := range e.Message {
+		errorObj.Error = append(errorObj.Error, msg)
+	}
+	errorObj.Type = e.ErrorType
+	errorObj.Status = e.Status
+
+	return errorObj
 }
 
 func (e CustomError) ErrorStatus() int {
@@ -54,26 +55,29 @@ func (e CustomError) Type() ErrorTypes {
 }
 
 func NewBadRequestError(msg string) *CustomError {
+	m := []string{msg}
 	return &CustomError{
 		ErrorType: BAD_REQUEST,
 		Status:    http.StatusBadRequest,
-		Message:   msg,
+		Message:   m,
 	}
 }
 
 func NewDatabaseError(msg string) *CustomError {
+	m := []string{msg}
 	return &CustomError{
 		ErrorType: INTERNAL,
 		Status:    http.StatusInternalServerError,
-		Message:   msg,
+		Message:   m,
 	}
 }
 
 func NewRabbitConnectionError(msg string) *CustomError {
+	m := []string{msg}
 	return &CustomError{
 		ErrorType: INTERNAL,
 		Status:    http.StatusInternalServerError,
-		Message:   msg,
+		Message:   m,
 	}
 }
 
@@ -81,23 +85,25 @@ func NewElevatedAuthError() *CustomError {
 	return &CustomError{
 		ErrorType: INVALID_ROLE,
 		Status:    http.StatusUnauthorized,
-		Message:   "Invalid user role",
+		Message:   []string{"Invalid user role"},
 	}
 }
 
 func NewEventPublisherError(msg string) *CustomError {
+	m := []string{msg}
 	return &CustomError{
 		ErrorType: EVENT_PUBLISH,
 		Status:    http.StatusInternalServerError,
-		Message:   msg,
+		Message:   m,
 	}
 }
 
 func NewEventConsumerError(msg string) *CustomError {
+	m := []string{msg}
 	return &CustomError{
 		ErrorType: EVENT_CONSUMER,
 		Status:    http.StatusInternalServerError,
-		Message:   msg,
+		Message:   m,
 	}
 }
 
@@ -105,15 +111,16 @@ func NewNotAuthorizedError() *CustomError {
 	return &CustomError{
 		ErrorType: NOT_AUTHORIZED,
 		Status:    http.StatusUnauthorized,
-		Message:   "Not unauthorized",
+		Message:   []string{"Not unauthorized"},
 	}
 }
 
 func NewNotFoundError(msg string) *CustomError {
+	m := []string{msg}
 	return &CustomError{
 		ErrorType: NOT_FOUND,
 		Status:    http.StatusNotFound,
-		Message:   msg,
+		Message:   m,
 	}
 }
 
@@ -121,23 +128,25 @@ func NewPayloadEncryptionError() *CustomError {
 	return &CustomError{
 		ErrorType: PAYLOAD_ENCRYPTION,
 		Status:    http.StatusBadRequest,
-		Message:   "JWT payload encryption error",
+		Message:   []string{"JWT payload encryption error"},
 	}
 }
 
-func NewPayloadValidationError() *CustomError {
-	return &CustomError{
-		ErrorType: PAYLOAD_VALIDATION,
-		Status:    http.StatusBadRequest,
-		Message:   "Validation error",
+func NewPayloadValidationError(validationErrors validator.ValidationErrors) *CustomError {
+	ce := CustomError{}
+	ce.ErrorType = PAYLOAD_VALIDATION
+	ce.Status = http.StatusBadRequest
+	for _, validationError := range validationErrors {
+		ce.Message = append(ce.Message, validationError.Error())
 	}
+	return &ce
 }
 
 func NewEnvError() *CustomError {
 	return &CustomError{
 		ErrorType: ENV,
 		Status:    http.StatusNotImplemented,
-		Message:   "Missing required env variable",
+		Message:   []string{"Missing required env variable"},
 	}
 }
 
